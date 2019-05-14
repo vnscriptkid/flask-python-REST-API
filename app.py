@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 stores = [
     {
@@ -32,7 +32,24 @@ stores = [
 app = Flask(__name__)
 
 # POST /stores
+@app.route('/stores', methods=['POST'])
+def createStore():
+    requestData = request.get_json()
+    newStore = {
+        'name': requestData['name'],
+        'items': []
+    }
+    stores.append(newStore)
+    return jsonify(newStore)
+
 # GET /stores/<string:name>
+@app.route('/stores/<string:storeName>', methods=['GET']) 
+def getStoreByName(storeName):
+    foundStores = list(filter( lambda store: store['name'] == storeName, stores ))
+    if (len(foundStores) == 0):
+        return jsonify({ 'msg': 'Store not Found!' })    
+    return jsonify({ 'store': foundStores[0] })
+
 
 # GET /stores
 @app.route('/stores', methods=['GET'])
@@ -40,7 +57,27 @@ def getStores():
     return jsonify({ 'stores': stores })
 
 # POST /stores/<string:storeName>/items
-# GET /store/<string:storeName>/items/<string:itemName>
+def createItemForStore(storeName):
+    for store in stores:
+        if store['name'] == storeName:            
+            requestData = request.get_json() 
+            newItem = {
+                'name': requestData['name'],
+                'price': requestData['price']
+            }
+            store['items'].append(newItem)
+            return jsonify({ 'item': newItem })
+    return jsonify({ 'msg': 'Store not found!' })
 
+# GET /store/<string:storeName>/items/<string:itemName>
+@app.route('/stores/<string:storeName>/items/<string:itemName>', methods=['GET'])
+def getStoreItemByName(storeName, itemName):
+    foundStores = list(filter( lambda store: store['name'] == storeName, stores ))
+    if (len(foundStores) == 0):
+        return jsonify({ 'msg': 'Store not Found!' })
+    foundItems = list(filter(lambda item: item['name'] == itemName, foundStores[0]['items']))
+    if (len(foundItems) == 0):
+        return jsonify({ 'msg': 'Item not Found!' })
+    return jsonify({ 'item': foundItems[0] })
 
 app.run(port=5000)
