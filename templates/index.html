@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Home Page</title>
+</head>
+<body>
+    <h1>Restful API</h1>
+    <script>
+        console.log('js is loaded!');
+        function httpGetAsync(url, cb) {
+            const xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function() {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                    cb(xmlHttp.responseText);
+                }
+            }
+            xmlHttp.open('GET', url, true);
+            xmlHttp.send(null);
+        }
+        httpGetAsync('http://localhost:5000/stores', function(res) {
+            alert(res)
+        })
+    </script>
+</body>
+</html>
